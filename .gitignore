@@ -1,0 +1,18 @@
+# --- macOS junk ---
+.DS_Store
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+
+# --- Secrets: never commit API keys / passwords ---
+.env
+*.key
+secrets.*
