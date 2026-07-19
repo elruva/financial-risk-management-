@@ -1,0 +1,16 @@
+company,ticker,bond,seniority,issue_rating,fred_bucket
+Microsoft,MSFT,3.30% 2027,Senior unsecured,AAA,AAA
+Apple,AAPL,3.25% 2029,Senior unsecured,AA+,AA
+Walmart,WMT,3.95% 2038,Senior unsecured,AA,AA
+Kraft Heinz,KHC,4.375% 2046,Senior unsecured,BBB,BBB
+Citigroup (sub notes),C,4.45% 2027,Subordinated,BBB-,BBB
+Dominion Energy (hyb),D,5.75% 2054,Junior subordinated,BBB-,BBB
+Ford Motor Credit,F,4.95% 2027,Senior unsecured,BB+,BB
+Occidental Petroleum,OXY,6.125% 2031,Senior unsecured,BB,BB
+Carnival,CCL,5.75% 2027,Senior unsecured,B,B
+Sabre,SABR,7.375% 2027,Senior secured,B-,B
+Lumen (secured),LUMN,5.375% 2029,Senior secured,B-,B
+Lumen (unsecured),LUMN,5.125% 2026,Senior unsecured,CCC+,CCC
+AMC Entertainment,AMC,7.50% 2029,Senior secured,CCC,CCC
+B. Riley Financial,RILY,6.75% 2028,Senior unsecured,CCC+,CCC
+Beyond Meat (conv),BYND,0% conv 2027,Senior unsecured,CCC,CCC
