@@ -1,0 +1,349 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 10 Cheatsheet: Portfolio Optimization in Python</title>
+<style>
+  :root{
+    --navy:#0D2B55; --navy2:#1F497D; --slate:#44546A; --ink:#1f2733;
+    --muted:#6B7280; --green:#038044; --blue:#1166AA; --red:#C0341D;
+    --amber-bg:#FFF7E8; --amber-br:#B4530A;
+    --line:#E3E7EC; --paper:#F6F7F9; --card:#FFFFFF;
+    --code-bg:#F3F5F8; --code-br:#DCE1E8; --cm:#0A7D43;
+    --sans:'Calibri','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+    --mono:'Consolas','SF Mono','Menlo','Liberation Mono','Courier New',monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:var(--sans); color:var(--ink); background:var(--paper);
+    font-size:15px; line-height:1.5; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  .container{max-width:1120px; margin:0 auto; padding:22px 24px 40px}
+
+  header.band{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,#2E6DA6 100%);
+    color:#fff; border-radius:12px; padding:22px 26px; margin-bottom:18px;
+  }
+  header.band h1{margin:0 0 4px; font-size:1.55rem; font-weight:700; letter-spacing:.2px}
+  header.band .sub{color:#CBD8E8; font-size:.95rem; margin-bottom:10px}
+  header.band .how{color:#EAF1F8; font-size:.9rem; max-width:70ch; margin:0}
+
+  .toolbar{display:flex; gap:10px; align-items:center; margin:0 0 16px}
+  .toolbar button{
+    font-family:var(--sans); font-size:.85rem; font-weight:600; color:#fff;
+    background:var(--slate); border:0; border-radius:7px; padding:8px 14px; cursor:pointer;
+  }
+  .toolbar .note{color:var(--muted); font-size:.82rem}
+
+  h2.sec{
+    font-size:1.02rem; color:var(--navy); font-weight:700; margin:22px 0 8px;
+    padding-bottom:5px; border-bottom:2px solid var(--line);
+  }
+
+  code.inl{font-family:var(--mono); font-size:.86em; background:var(--code-bg);
+    border:1px solid var(--code-br); border-radius:4px; padding:.5px 4px; color:var(--navy)}
+
+  pre{margin:8px 0 2px; background:var(--code-bg); border:1px solid var(--code-br);
+    border-left:3px solid var(--navy); border-radius:7px; padding:11px 13px;
+    overflow-x:auto}
+  pre code{font-family:var(--mono); font-size:.8rem; line-height:1.5; color:#233; white-space:pre}
+  .cm{color:var(--cm); font-style:italic}
+
+  .setup{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:6px 16px 14px}
+  .kick{background:#EEF3F9; border:1px solid #D8E2EE; border-radius:9px;
+    padding:11px 14px; font-size:.9rem; color:#28405c; margin:6px 0 2px}
+
+  table{width:100%; border-collapse:collapse; margin:6px 0 2px; font-size:.86rem}
+  thead th{background:var(--navy); color:#fff; text-align:left; font-weight:600;
+    padding:7px 9px}
+  tbody td{padding:6px 9px; border-bottom:1px solid var(--line); vertical-align:top}
+  tbody tr:nth-child(even){background:#FAFBFC}
+  td code{font-family:var(--mono); font-size:.82em; color:var(--navy)}
+
+  .badge{display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.3px;
+    padding:2px 7px; border-radius:20px; color:#fff; white-space:nowrap; vertical-align:middle}
+  .b-pp{background:var(--blue)} .b-rf{background:var(--green)} .b-none{background:#7C8794}
+
+  .warn{background:var(--amber-bg); border:1px solid #F0D9B0; border-left:5px solid var(--amber-br);
+    border-radius:9px; padding:12px 16px; margin:12px 0 4px}
+  .warn b{color:var(--amber-br)}
+  .warn code{font-family:var(--mono); font-size:.86em; background:#fff5e3; padding:.5px 4px; border-radius:4px}
+
+  .cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:14px; margin-top:6px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:12px 14px 13px; break-inside:avoid}
+  .card .head{display:flex; align-items:center; gap:8px; margin-bottom:7px}
+  .card .num{flex:0 0 auto; width:24px; height:24px; border-radius:6px; background:var(--navy);
+    color:#fff; font-weight:700; font-size:.82rem; display:flex; align-items:center; justify-content:center}
+  .card .name{font-weight:700; color:var(--navy); font-size:.98rem; flex:1 1 auto}
+  .row{font-size:.85rem; margin:3px 0}
+  .row .lbl{display:inline-block; min-width:58px; font-weight:700; color:var(--slate); font-size:.74rem;
+    text-transform:uppercase; letter-spacing:.4px; vertical-align:top}
+  .row.care{color:#7a2c1c}
+  .row.care .lbl{color:var(--red)}
+
+  .gloss{columns:2; column-gap:26px; font-size:.86rem; margin-top:4px}
+  .gloss div{break-inside:avoid; margin:0 0 6px}
+  .gloss b{color:var(--navy)}
+
+  footer{margin-top:22px; padding-top:12px; border-top:2px solid var(--line);
+    color:var(--muted); font-size:.8rem; text-align:center}
+
+  @page{size:A4; margin:11mm}
+  @media print{
+    body{background:#fff; font-size:9.6pt}
+    .container{max-width:none; padding:0}
+    .toolbar{display:none}
+    header.band{border-radius:0}
+    .cards{grid-template-columns:1fr 1fr; gap:9px}
+    .card,table,.warn,.setup,.kick{break-inside:avoid}
+    pre code{font-size:7.6pt}
+    h2.sec{margin-top:12px}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="band">
+    <h1>Session 10: Portfolio Optimization in Python</h1>
+    <div class="sub">Quick reference &middot; PyPortfolioOpt and riskfolio-lib &middot; Financial Risk Management and Engineering</div>
+    <p class="how">Run the <b>Setup once</b> block first. Then copy any method box and run it. Every method uses the same names (<code class="inl" style="color:#EAF1F8;background:rgba(255,255,255,.12);border-color:transparent">prices, mu, S_lw, simp_ret, available</code>) and prints its weights the same way, so once you learn one, you can read them all.</p>
+  </header>
+
+  <div class="toolbar">
+    <button onclick="window.print()">Print / Save as PDF</button>
+    <span class="note">Tip: in the print dialog turn on "Background graphics" so the colours show.</span>
+  </div>
+
+  <h2 class="sec">Install once</h2>
+  <pre><code>pip install PyPortfolioOpt riskfolio-lib</code></pre>
+  <div class="kick">No installs allowed on your machine? <b>Google Colab</b> runs everything in the browser: put <code class="inl">!pip install PyPortfolioOpt riskfolio-lib</code> in the first cell.</div>
+
+  <h2 class="sec">Setup once (run this before any method)</h2>
+  <div class="setup">
+  <pre><code>import numpy as np
+import pandas as pd
+import yfinance as yf
+from pypfopt import expected_returns, risk_models
+from pypfopt import EfficientFrontier, HRPOpt, objective_functions
+from pypfopt import black_litterman, BlackLittermanModel
+import riskfolio as rp
+
+# 1) Pick your stocks (tickers) and download daily prices
+available = ["AAPL", "MSFT", "JPM", "XOM", "JNJ", "PG", "GLD", "TLT"]
+prices = yf.download(available, start="2021-07-01", end="2026-07-01",
+                     auto_adjust=True)["Close"]
+prices = prices[available].dropna()      # keep the column order, drop empty rows
+
+# 2) The two ingredients almost every method needs
+mu   = expected_returns.mean_historical_return(prices)        # expected yearly return per stock
+S_lw = risk_models.CovarianceShrinkage(prices).ledoit_wolf()  # smoothed risk-and-correlation table
+
+# 3) Daily simple returns (needed by risk parity and HRP)
+simp_ret = prices.pct_change().dropna()
+
+RF = 0.04    # risk-free rate per year, e.g. 4%
+
+# A tiny helper so every method prints its weights the same way
+def show(weights):
+    """Print each stock's weight as a percentage, biggest first."""
+    s = pd.Series(weights).sort_values(ascending=False)
+    for name, wgt in s.items():
+        print(f"  {name:6s} {wgt*100:5.1f}%")</code></pre>
+  </div>
+  <div class="kick"><b>Good to know.</b> PyPortfolioOpt covers most methods. Equal Weight and Inverse Volatility are one-line formulas with no library. Equal Risk Contribution and CVaR Risk Parity use riskfolio-lib, because PyPortfolioOpt has no risk-parity solver. Methods 1 and 2 are benchmarks (simple yardsticks), not optimizers.</div>
+
+  <h2 class="sec">All ten methods at a glance</h2>
+  <table>
+    <thead><tr><th>Method</th><th>What it does</th><th>Library</th><th>Key function</th></tr></thead>
+    <tbody>
+      <tr><td>1. Equal Weight (1/N)</td><td>Same money in every stock</td><td><span class="badge b-none">none</span></td><td><code>pd.Series(1/n)</code></td></tr>
+      <tr><td>2. Inverse Volatility</td><td>More money in calmer stocks</td><td><span class="badge b-none">none</span></td><td><code>1 / vols</code></td></tr>
+      <tr><td>3. Max Sharpe (Markowitz)</td><td>Best return for its risk</td><td><span class="badge b-pp">PyPortfolioOpt</span></td><td><code>EfficientFrontier(mu, S_lw).max_sharpe()</code></td></tr>
+      <tr><td>4. Minimum Variance (GMV)</td><td>The calmest possible mix</td><td><span class="badge b-pp">PyPortfolioOpt</span></td><td><code>EfficientFrontier(None, S_lw).min_volatility()</code></td></tr>
+      <tr><td>5. Equal Risk Contribution</td><td>Every stock adds equal risk</td><td><span class="badge b-rf">riskfolio-lib</span></td><td><code>port.rp_optimization(rm='MV', b=None)</code></td></tr>
+      <tr><td>6. CVaR Risk Parity</td><td>Equal share of tail loss</td><td><span class="badge b-rf">riskfolio-lib</span></td><td><code>port.rp_optimization(rm='CVaR', b=None)</code></td></tr>
+      <tr><td>7. Black-Litterman</td><td>Market view plus your views</td><td><span class="badge b-pp">PyPortfolioOpt</span></td><td><code>BlackLittermanModel(...)</code></td></tr>
+      <tr><td>8. HRP</td><td>Cluster stocks, then split risk</td><td><span class="badge b-pp">PyPortfolioOpt</span></td><td><code>HRPOpt(returns).optimize()</code></td></tr>
+      <tr><td>9. Robust (L2)</td><td>Spread weights out, more stable</td><td><span class="badge b-pp">PyPortfolioOpt</span></td><td><code>add_objective(L2_reg) + min_volatility()</code></td></tr>
+      <tr><td>10. ESG-tilted</td><td>Optimize with an ESG floor</td><td><span class="badge b-pp">PyPortfolioOpt</span></td><td><code>add_constraint(...) + max_quadratic_utility()</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn">
+    <b>IMPORTANT, read once.</b> In PyPortfolioOpt, <code>ef.max_sharpe()</code> ignores any extra rules you add with <code>add_objective</code> or <code>add_constraint</code>, because of a math shortcut it uses inside. So for the <b>Robust (9)</b> and <b>ESG (10)</b> methods you MUST use <code>ef.min_volatility()</code> or <code>ef.max_quadratic_utility()</code>, never <code>ef.max_sharpe()</code>.
+  </div>
+
+  <h2 class="sec">The ten methods</h2>
+  <div class="cards">
+
+    <div class="card">
+      <div class="head"><div class="num">1</div><div class="name">Equal Weight (1/N)</div><span class="badge b-none">none</span></div>
+      <div class="row"><span class="lbl">What</span> Put the same fraction of money in every stock. With 8 stocks, each gets 1/8.</div>
+      <div class="row"><span class="lbl">Use</span> A simple benchmark. It is famously hard to beat and needs no estimates.</div>
+      <pre><code>w = pd.Series(1/len(available), index=available)
+show(w)</code></pre>
+      <div class="row"><span class="lbl">Needs</span> just the list of tickers (<code class="inl">available</code>).</div>
+      <div class="row care"><span class="lbl">Careful</span> it ignores risk, so jumpy stocks carry most of the risk.</div>
+    </div>
+
+    <div class="card">
+      <div class="head"><div class="num">2</div><div class="name">Inverse Volatility</div><span class="badge b-none">none</span></div>
+      <div class="row"><span class="lbl">What</span> More money in calm stocks, less in jumpy ones. Volatility means how much a stock wiggles.</div>
+      <div class="row"><span class="lbl">Use</span> A quick, cheap, risk-aware benchmark.</div>
+      <pre><code>vols = np.sqrt(np.diag(S_lw))            # each stock's yearly volatility
+w = pd.Series((1/vols) / np.sum(1/vols), index=available)
+show(w)</code></pre>
+      <div class="row"><span class="lbl">Needs</span> <code class="inl">S_lw</code> (to read the volatilities).</div>
+      <div class="row care"><span class="lbl">Careful</span> it looks at each stock alone and ignores how stocks move together.</div>
+    </div>
+
+    <div class="card">
+      <div class="head"><div class="num">3</div><div class="name">Maximum Sharpe (Markowitz)</div><span class="badge b-pp">PyPortfolioOpt</span></div>
+      <div class="row"><span class="lbl">What</span> The mix with the best return for its risk. Sharpe ratio = extra return divided by risk. The classic tangency portfolio.</div>
+      <div class="row"><span class="lbl">Use</span> When you trust your return estimates and want the best risk-adjusted mix.</div>
+      <pre><code>ef = EfficientFrontier(mu, S_lw)
+ef.max_sharpe(risk_free_rate=RF)
+w = ef.clean_weights()    # tidy up: tiny weights set to 0
+show(w)</code></pre>
+      <div class="row"><span class="lbl">Needs</span> <code class="inl">mu</code> and <code class="inl">S_lw</code>.</div>
+      <div class="row care"><span class="lbl">Careful</span> it reacts strongly to <code class="inl">mu</code>, so small changes in your guesses swing the weights a lot.</div>
+    </div>
+
+    <div class="card">
+      <div class="head"><div class="num">4</div><div class="name">Minimum Variance (GMV)</div><span class="badge b-pp">PyPortfolioOpt</span></div>
+      <div class="row"><span class="lbl">What</span> The least-risky mix, ignoring returns. GMV means Global Minimum Variance.</div>
+      <div class="row"><span class="lbl">Use</span> When you do not trust return forecasts and just want the calmest portfolio.</div>
+      <pre><code>ef = EfficientFrontier(None, S_lw)   # None means "do not use returns"
+ef.min_volatility()
+w = ef.clean_weights()
+show(w)</code></pre>
+      <div class="row"><span class="lbl">Needs</span> <code class="inl">S_lw</code> only.</div>
+      <div class="row care"><span class="lbl">Careful</span> it can pile most of the money into a few low-risk stocks.</div>
+    </div>
+
+    <div class="card">
+      <div class="head"><div class="num">5</div><div class="name">Equal Risk Contribution (ERC)</div><span class="badge b-rf">riskfolio-lib</span></div>
+      <div class="row"><span class="lbl">What</span> Weights so every stock adds the same amount of risk. The money is not shared equally, the risk is.</div>
+      <div class="row"><span class="lbl">Use</span> When you want risk spread evenly rather than money spread evenly (the "all-weather" idea).</div>
+      <pre><code>port = rp.Portfolio(returns=simp_ret[available])
+port.assets_stats(method_mu='hist', method_cov='ledoit')   # estimate the inputs
+w = port.rp_optimization(model='Classic', rm='MV', rf=0, b=None, hist=True)
+# rm='MV' = balance variance risk;  b=None = equal 1/N risk share = true ERC
+show(w["weights"])       # riskfolio returns a table with a 'weights' column</code></pre>
+      <div class="row"><span class="lbl">Needs</span> <code class="inl">simp_ret</code>.</div>
+      <div class="row care"><span class="lbl">Careful</span> the result is a DataFrame, so read the <code class="inl">"weights"</code> column (not a plain dict).</div>
+    </div>
+
+    <div class="card">
+      <div class="head"><div class="num">6</div><div class="name">CVaR Risk Parity</div><span class="badge b-rf">riskfolio-lib</span></div>
+      <div class="row"><span class="lbl">What</span> Like ERC, but it balances each stock's share of tail loss instead of variance. CVaR is the average loss on the worst days.</div>
+      <div class="row"><span class="lbl">Use</span> When you care about crash losses more than everyday wiggles.</div>
+      <pre><code>port = rp.Portfolio(returns=simp_ret[available])
+port.assets_stats(method_mu='hist', method_cov='ledoit')
+w = port.rp_optimization(model='Classic', rm='CVaR', rf=0, b=None, hist=True)
+show(w["weights"])</code></pre>
+      <div class="row"><span class="lbl">Needs</span> <code class="inl">simp_ret</code>.</div>
+      <div class="row care"><span class="lbl">Careful</span> CVaR comes from history, so it needs enough data and is noisier than variance.</div>
+    </div>
+
+    <div class="card">
+      <div class="head"><div class="num">7</div><div class="name">Black-Litterman</div><span class="badge b-pp">PyPortfolioOpt</span></div>
+      <div class="row"><span class="lbl">What</span> Start from what the whole market implies, then nudge it with your own views. Market wisdom plus your opinions.</div>
+      <div class="row"><span class="lbl">Use</span> When you have a few specific views and want gentle, sensible tilts.</div>
+      <pre><code># market_prices = price history of a market index (for example SPY)
+market_prices = yf.download("SPY", start="2021-07-01", end="2026-07-01",
+                            auto_adjust=True)["Close"]
+mkt_caps = {t: 1e9 for t in available}    # market value of each firm (use real numbers)
+view_dict = {"AAPL": 0.10}                # "I expect AAPL to return 10% per year"
+
+delta = black_litterman.market_implied_risk_aversion(market_prices)
+prior = black_litterman.market_implied_prior_returns(mkt_caps, delta, S_lw)
+bl = BlackLittermanModel(S_lw, pi=prior, absolute_views=view_dict)
+
+ef = EfficientFrontier(bl.bl_returns(), bl.bl_cov())
+ef.max_sharpe(risk_free_rate=RF)
+w = ef.clean_weights()
+show(w)</code></pre>
+      <div class="row"><span class="lbl">Needs</span> <code class="inl">S_lw</code>, a market index price series, market caps, and your views.</div>
+      <div class="row care"><span class="lbl">Careful</span> replace the placeholder market caps with real values, or the starting point is wrong.</div>
+    </div>
+
+    <div class="card">
+      <div class="head"><div class="num">8</div><div class="name">Hierarchical Risk Parity (HRP)</div><span class="badge b-pp">PyPortfolioOpt</span></div>
+      <div class="row"><span class="lbl">What</span> Groups stocks that move together into a tree, then splits risk down the tree. It never inverts the risk table, so it stays stable.</div>
+      <div class="row"><span class="lbl">Use</span> With many stocks or shaky data, where classic methods become unstable.</div>
+      <pre><code>hrp = HRPOpt(returns=simp_ret[available])
+hrp.optimize()
+w = hrp.clean_weights()
+show(w)</code></pre>
+      <div class="row"><span class="lbl">Needs</span> <code class="inl">simp_ret</code>.</div>
+      <div class="row care"><span class="lbl">Careful</span> give it returns (<code class="inl">simp_ret</code>), not prices.</div>
+    </div>
+
+    <div class="card">
+      <div class="head"><div class="num">9</div><div class="name">Robust weights (L2)</div><span class="badge b-pp">PyPortfolioOpt</span></div>
+      <div class="row"><span class="lbl">What</span> A minimum-variance mix with a rule that pushes weights apart, so money is not dumped into one or two names.</div>
+      <div class="row"><span class="lbl">Use</span> When plain optimizers give one giant position and you want a spread-out, stable mix.</div>
+      <pre><code>ef = EfficientFrontier(mu, S_lw)
+ef.add_objective(objective_functions.L2_reg, gamma=0.1)  # bigger gamma = more spread out
+ef.min_volatility()                                      # NOT max_sharpe (see the box)
+w = ef.clean_weights()
+show(w)</code></pre>
+      <div class="row"><span class="lbl">Needs</span> <code class="inl">mu</code> and <code class="inl">S_lw</code>.</div>
+      <div class="row care"><span class="lbl">Careful</span> use <code class="inl">min_volatility</code> or <code class="inl">max_quadratic_utility</code> here, never <code class="inl">max_sharpe</code>.</div>
+    </div>
+
+    <div class="card">
+      <div class="head"><div class="num">10</div><div class="name">ESG-tilted portfolio</div><span class="badge b-pp">PyPortfolioOpt</span></div>
+      <div class="row"><span class="lbl">What</span> The best risk-adjusted mix that also keeps the average ESG score above a target. ESG is a sustainability score per stock.</div>
+      <div class="row"><span class="lbl">Use</span> When you must meet a sustainability rule while still optimizing.</div>
+      <pre><code># esg_scores: one score per stock, in the same order as `available`
+esg_scores = pd.Series({t: 50 for t in available})   # replace with real scores
+esg_target = 60                                       # required average score
+
+ef = EfficientFrontier(mu, S_lw)
+# add_constraint takes a small function of the weights w:
+ef.add_constraint(lambda w: esg_scores.values @ w &gt;= esg_target)
+ef.max_quadratic_utility(risk_aversion=1)            # NOT max_sharpe (see the box)
+w = ef.clean_weights()
+show(w)</code></pre>
+      <div class="row"><span class="lbl">Needs</span> <code class="inl">mu</code>, <code class="inl">S_lw</code>, and an ESG score for each stock.</div>
+      <div class="row care"><span class="lbl">Careful</span> if your ESG data is a risk score where lower is better, flip the rule (use <code class="inl">&lt;=</code>).</div>
+    </div>
+
+  </div>
+
+  <h2 class="sec">Glossary</h2>
+  <div class="gloss">
+    <div><b>Expected returns (mu):</b> your best guess of each stock's future yearly return.</div>
+    <div><b>Covariance matrix (S_lw):</b> a table showing how much each pair of stocks moves together.</div>
+    <div><b>Ledoit-Wolf shrinkage:</b> a way to smooth that table so it is more reliable when data is limited.</div>
+    <div><b>Volatility:</b> how much a stock's price wiggles; higher means riskier.</div>
+    <div><b>Risk contribution:</b> how much of the portfolio's total risk comes from one stock.</div>
+    <div><b>Tangency / max-Sharpe portfolio:</b> the mix with the best return for its risk.</div>
+    <div><b>Risk parity:</b> weights chosen so every stock adds the same risk.</div>
+    <div><b>CVaR:</b> the average loss on the worst days; a measure of crash (tail) risk.</div>
+  </div>
+
+  <footer>
+    Yuriy Zabolotnyuk &middot; Sprott School of Business &middot; Carleton University &nbsp;|&nbsp; Financial Risk Management and Engineering, Session 10
+  </footer>
+
+</div>
+
+<script>
+  // Colour Python comments green (runs on load; if scripting is off, code still shows plainly)
+  document.querySelectorAll('pre code').forEach(function(block){
+    block.innerHTML = block.innerHTML.split('\n').map(function(line){
+      var i = line.indexOf('#');
+      if (i > -1){ return line.slice(0,i) + '<span class="cm">' + line.slice(i) + '</span>'; }
+      return line;
+    }).join('\n');
+  });
+</script>
+</body>
+</html>
