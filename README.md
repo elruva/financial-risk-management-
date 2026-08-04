@@ -35,4 +35,4 @@ used to reproduce the analysis. No live market feeds or credentials are stored i
 this repo.
 
 ---
-*Maintained by kvlv17 — work in progress, updated as the course goes.*
+*Maintained by elruva — work in progress, updated as the course goes.*
